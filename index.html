@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<title>라인온의원 · 온라인 시술실</title>
+<meta name="description" content="말없이 같이 누워 있는 온라인 시술실. 빈 베드에 누우면 Dr. Oh가 와서 스킨부스터를 놔 드립니다.">
+<meta property="og:title" content="라인온의원 · 온라인 시술실">
+<meta property="og:description" content="말없이 같이 누워 있는 온라인 시술실.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#121415">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<!-- 입장 -->
+<div id="entry">
+  <div class="entry-card">
+    <img src="assets/mark_kr_clinic.svg" alt="라인온의원" class="entry-logo">
+    <p class="entry-sub">말없이 같이 누워 있는 온라인 시술실</p>
+    <label class="nick"><span>닉네임</span><input id="nick" maxlength="12" autocomplete="off" spellcheck="false"></label>
+    <button id="enter" class="btn-primary">시술실 들어가기</button>
+    <p class="entry-foot">빈 베드에 누우면 Dr. Oh가 와서 스킨부스터를 놔 드립니다.</p>
+  </div>
+</div>
+
+<!-- HUD -->
+<header id="hud">
+  <div class="brand">
+    <img src="assets/mark_lineon_ps.svg" alt="" class="brand-mark">
+    <div class="brand-text"><b>라인온의원</b><small id="roomname">시술실</small></div>
+  </div>
+  <div class="hud-right">
+    <span class="pill" id="count" title="지금 접속한 사람">👤 <b>1</b></span>
+    <span class="pill" id="shots" title="오늘 누적 샷">샷 <b>0</b></span>
+    <button class="pill btn" id="mute" aria-pressed="false" title="소리">♪</button>
+  </div>
+</header>
+
+<div id="hint">바닥을 눌러 이동 · 빈 베드를 눌러 눕기 · 드래그로 둘러보기</div>
+
+<div id="say" class="bubble" hidden></div>
+
+<!-- 메뉴 -->
+<section id="menu" hidden>
+  <h3>스킨부스터 메뉴 <small>원하는 시술을 골라주세요</small></h3>
+  <div class="boosters" id="boosters"></div>
+  <button class="link" id="standup">그냥 일어날래요</button>
+</section>
+
+<!-- 쿨링 -->
+<div id="cool" hidden>
+  <div class="timer" id="timer">10:00</div>
+  <p>쿨링팩 올려드렸어요. 편하게 쉬세요.</p>
+  <button class="btn-ghost" id="getup">일어나기</button>
+</div>
+
+<footer id="foot">
+  <a id="kakao" class="btn-kakao" href="#" target="_blank" rel="noopener">카카오톡 상담 예약</a>
+</footer>
+
+<div id="toast" hidden></div>
+
+<script src="config.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<script type="module" src="app.js?v=2"></script>
+</body>
+</html>

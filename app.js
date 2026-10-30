@@ -43,12 +43,12 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 0.9;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0e1011);
-scene.fog = new THREE.Fog(0x0e1011, 18, 34);
+scene.background = new THREE.Color(0xd9cdb8);
+scene.fog = new THREE.Fog(0xd9cdb8, 22, 40);
 
 const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 80);
 const cam = { yaw: 0, pitch: 0.42, dist: 7, target: new THREE.Vector3(0, 1, 2) };
@@ -73,11 +73,20 @@ function woodTexture() {
   const tex = new THREE.CanvasTexture(c); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(4, 3); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   return tex;
 }
-const matFloor = new THREE.MeshStandardMaterial({ map: woodTexture(), roughness: 0.75, metalness: 0.05 });
-const matWall = new THREE.MeshStandardMaterial({ color: 0x2e3337, roughness: 0.95 });
-const matWallAccent = new THREE.MeshStandardMaterial({ color: 0x25292c, roughness: 0.9 });
-const matCeil = new THREE.MeshStandardMaterial({ color: 0x1a1c1e, roughness: 1 });
-const matFrame = new THREE.MeshStandardMaterial({ color: 0x3a3f43, roughness: 0.6, metalness: 0.3 });
+function stoneTexture() { // 크림색 대형 타일 (실제 라인온 바닥 느낌)
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 1024; const g = c.getContext('2d');
+  g.fillStyle = '#d8ccb7'; g.fillRect(0, 0, 1024, 1024);
+  for (let y = 0; y < 2; y++) for (let x = 0; x < 2; x++) {
+    const t = 0.97 + Math.random() * 0.06; g.fillStyle = `rgb(${(226 * t) | 0},${(214 * t) | 0},${(194 * t) | 0})`; g.fillRect(x * 512 + 3, y * 512 + 3, 506, 506);
+    for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(120,100,80,${Math.random() * 0.05})`; g.beginPath(); g.ellipse(x * 512 + Math.random() * 512, y * 512 + Math.random() * 512, 20 + Math.random() * 80, 6 + Math.random() * 20, Math.random() * 3, 0, Math.PI * 2); g.fill(); }
+  }
+  const tex = new THREE.CanvasTexture(c); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(ROOM.w / 2.4, ROOM.d / 2.4); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; return tex;
+}
+const matFloor = new THREE.MeshStandardMaterial({ map: stoneTexture(), roughness: 0.55, metalness: 0.02 });
+const matWall = new THREE.MeshStandardMaterial({ color: 0xcbbda4, roughness: 0.95 });          // 베이지 스타코
+const matWallAccent = new THREE.MeshStandardMaterial({ color: 0xcdbfa7, roughness: 0.9 });    // 로고 벽 (대리석 톤)
+const matCeil = new THREE.MeshStandardMaterial({ color: 0xe8e0d2, roughness: 1 });
+const matFrame = new THREE.MeshStandardMaterial({ color: 0xa89c89, roughness: 0.7, metalness: 0.1 }); // 베드 프레임 (웜 그레이)
 const matMattress = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.9 });
 const matPillow = new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.95 });
 const matBlanket = new THREE.MeshStandardMaterial({ color: 0xea660d, roughness: 0.85 });
@@ -153,7 +162,7 @@ function buildRoom() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), matFloor);
   floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; floor.name = 'floor'; scene.add(floor);
 
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x0b0c0d, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0xcdc1aa, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
   const ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), matCeil);
   ceil.rotation.x = Math.PI / 2; ceil.position.y = ROOM.h; scene.add(ceil);
 
@@ -164,17 +173,22 @@ function buildRoom() {
   mk(ROOM.d, ROOM.h, ROOM.w / 2, ROOM.h / 2, 0, -Math.PI / 2);              // 오른벽 (문)
 
   // 걸레받이
-  const skirt = new THREE.Mesh(new THREE.BoxGeometry(ROOM.w, 0.12, 0.04), matFrame); skirt.position.set(0, 0.06, -ROOM.d / 2 + 0.02); scene.add(skirt);
+  const skirt = new THREE.Mesh(new THREE.BoxGeometry(ROOM.w, 0.12, 0.04), new THREE.MeshStandardMaterial({ color: 0xe9e1d3 })); skirt.position.set(0, 0.06, -ROOM.d / 2 + 0.02); scene.add(skirt);
 
-  // 천장 패널 조명 3개
-  for (let i = -1; i <= 1; i++) {
-    const panel = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.06, 1.2), new THREE.MeshStandardMaterial({ color: 0xfff6e6, emissive: 0xfff1d6, emissiveIntensity: 1.4 }));
-    panel.position.set(i * 4.6, ROOM.h - 0.03, -0.5); scene.add(panel);
-    const rim = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.05, 1.4), matFrame); rim.position.set(i * 4.6, ROOM.h - 0.01, -0.5); scene.add(rim);
-    const pl = new THREE.PointLight(0xffe9c9, 55, 18, 1.5); pl.position.set(i * 4.6, ROOM.h - 0.5, -0.5); pl.castShadow = i === 0; pl.shadow.mapSize.set(1024, 1024); pl.shadow.bias = -0.002; scene.add(pl);
+  // 매립 다운라이트 (작은 원형) + 간접조명 코브
+  const dlMat = new THREE.MeshStandardMaterial({ color: 0xfff8ec, emissive: 0xfff3dc, emissiveIntensity: 1.6 });
+  for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) {
+    const dl = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.02, 20), dlMat); dl.position.set(i * 4.6, ROOM.h - 0.01, -3.4 + (j + 1) * 3.4); scene.add(dl);
+    const pl = new THREE.PointLight(0xffefd8, 12, 12, 1.7); pl.position.set(i * 4.6, ROOM.h - 0.4, -3.4 + (j + 1) * 3.4); pl.castShadow = (i === 0 && j === 1); pl.shadow.mapSize.set(1024, 1024); pl.shadow.bias = -0.002; scene.add(pl);
   }
-  scene.add(new THREE.AmbientLight(0xffe4c8, 0.6));
-  const hemi = new THREE.HemisphereLight(0xffe1c1, 0x15171a, 0.9); scene.add(hemi);
+  const coveMat = new THREE.MeshStandardMaterial({ color: 0xffe9c8, emissive: 0xffd9a8, emissiveIntensity: 1.2 });
+  const coveN = new THREE.Mesh(new THREE.BoxGeometry(ROOM.w - 0.4, 0.04, 0.08), coveMat); coveN.position.set(0, ROOM.h - 0.12, -ROOM.d / 2 + 0.35); scene.add(coveN);
+  const coveS = coveN.clone(); coveS.position.z = ROOM.d / 2 - 0.35; scene.add(coveS);
+  scene.add(new THREE.AmbientLight(0xfff1e0, 0.35));
+  const hemi = new THREE.HemisphereLight(0xfff4e6, 0xb9ab92, 0.45); scene.add(hemi);
+  // 창문 쪽 햇살 (오른벽 앞부분)
+  const sun = new THREE.DirectionalLight(0xffe7c4, 1.1); sun.position.set(ROOM.w / 2 + 4, ROOM.h + 2, -1); sun.target.position.set(0, 0, 0); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = -10; sun.shadow.camera.right = 10; sun.shadow.camera.top = 10; sun.shadow.camera.bottom = -10; sun.shadow.bias = -0.0015; scene.add(sun, sun.target);
 
   // 뒷벽 로고 (SVG → 텍스처), 은은하게
   const img = new Image(); img.src = 'assets/mark_lineon_ps.svg';
@@ -183,9 +197,17 @@ function buildRoom() {
     const r = Math.min(900 / img.width, 900 / img.height); const w = img.width * r, h = img.height * r;
     g.drawImage(img, (1024 - w) / 2, (1024 - h) / 2, w, h);
     const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
-    const logo = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 1, color: 0xffffff }));
-    logo.position.set(0, 1.85, -ROOM.d / 2 + 0.02); scene.add(logo);
-    const spot = new THREE.SpotLight(0xffd9b3, 30, 9, 0.5, 0.6, 1.2); spot.position.set(0, ROOM.h - 0.1, -ROOM.d / 2 + 2.2); spot.target.position.set(0, 1.8, -ROOM.d / 2); scene.add(spot, spot.target);
+    // 백라이트 글로우 (실제 간판처럼 뒤에서 빛남)
+    const gc = document.createElement('canvas'); gc.width = 512; gc.height = 512; const gg = gc.getContext('2d');
+    const grad = gg.createRadialGradient(256, 256, 40, 256, 256, 256); grad.addColorStop(0, 'rgba(255,245,225,.95)'); grad.addColorStop(0.5, 'rgba(255,240,215,.35)'); grad.addColorStop(1, 'rgba(255,240,215,0)'); gg.fillStyle = grad; gg.fillRect(0, 0, 512, 512);
+    const glowTex = new THREE.CanvasTexture(gc); glowTex.colorSpace = THREE.SRGBColorSpace;
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.6), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false }));
+    glow.position.set(0, 1.85, -ROOM.d / 2 + 0.03); scene.add(glow);
+    const logo = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 1, color: 0xffffff }));
+    logo.position.set(0, 1.85, -ROOM.d / 2 + 0.05); scene.add(logo);
+    const spot = new THREE.SpotLight(0xffe3c4, 18, 9, 0.5, 0.6, 1.2); spot.position.set(0, ROOM.h - 0.1, -ROOM.d / 2 + 2.2); spot.target.position.set(0, 1.8, -ROOM.d / 2); scene.add(spot, spot.target);
+    // 대리석 패널 (로고 뒤)
+    const marble = new THREE.Mesh(new THREE.BoxGeometry(4.2, ROOM.h - 0.3, 0.05), new THREE.MeshStandardMaterial({ color: 0xe6dccb, roughness: 0.35 })); marble.position.set(0, (ROOM.h - 0.3) / 2, -ROOM.d / 2 + 0.01); scene.add(marble);
   };
 
   // 이벤트 포스터 (왼벽) — 캔버스로 직접 그림 (선명하게)
@@ -202,20 +224,20 @@ function buildRoom() {
 
   // 작은 메뉴 보드는 포스터 옆으로 (오른쪽 벽)
   const bc = document.createElement('canvas'); bc.width = 1024; bc.height = 560; const bg = bc.getContext('2d');
-  bg.fillStyle = '#0f1112'; bg.fillRect(0, 0, 1024, 560);
+  bg.fillStyle = '#f7f3ec'; bg.fillRect(0, 0, 1024, 560);
   bg.fillStyle = '#EA660D'; bg.fillRect(60, 60, 8, 440);
-  bg.fillStyle = '#f1ece4'; bg.font = '300 44px "Noto Sans KR", sans-serif'; bg.textBaseline = 'top'; bg.fillText('SKIN BOOSTER', 100, 56);
-  bg.fillStyle = '#9aa0a3'; bg.font = '300 26px "Noto Sans KR", sans-serif'; bg.fillText('MENU', 100, 112);
-  bg.fillStyle = '#f1ece4'; bg.font = '400 34px "Noto Sans KR", sans-serif';
-  BOOSTERS.forEach((b, i) => { bg.fillText(b.n, 100, 180 + i * 66); bg.fillStyle = '#9aa0a3'; bg.font = '300 24px "Noto Sans KR", sans-serif'; bg.fillText(b.d, 560, 186 + i * 66); bg.fillStyle = '#f1ece4'; bg.font = '400 34px "Noto Sans KR", sans-serif'; });
+  bg.fillStyle = '#2b2522'; bg.font = '500 44px "Noto Sans KR", sans-serif'; bg.textBaseline = 'top'; bg.fillText('SKIN BOOSTER', 100, 56);
+  bg.fillStyle = '#EA660D'; bg.font = '400 26px "Noto Sans KR", sans-serif'; bg.fillText('MENU', 100, 112);
+  bg.fillStyle = '#2b2522'; bg.font = '500 34px "Noto Sans KR", sans-serif';
+  BOOSTERS.forEach((b, i) => { bg.fillText(b.n, 100, 180 + i * 66); bg.fillStyle = '#6b625b'; bg.font = '400 24px "Noto Sans KR", sans-serif'; bg.fillText(b.d, 560, 186 + i * 66); bg.fillStyle = '#2b2522'; bg.font = '500 34px "Noto Sans KR", sans-serif'; });
   const btex = new THREE.CanvasTexture(bc); btex.colorSpace = THREE.SRGBColorSpace;
-  const board = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.0, 1.85), new THREE.MeshStandardMaterial({ color: 0x0f1112, roughness: 0.6 }));
+  const board = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.0, 1.85), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
   board.position.set(ROOM.w / 2 - 0.03, 1.7, -2.2); scene.add(board);
   const bplane = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 0.96), new THREE.MeshBasicMaterial({ map: btex }));
   bplane.position.set(ROOM.w / 2 - 0.07, 1.7, -2.2); bplane.rotation.y = -Math.PI / 2; scene.add(bplane);
 
   // 문 (오른벽) — 간호사 등장
-  const door = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.2, 1.1), new THREE.MeshStandardMaterial({ color: 0x3a3330, roughness: 0.7 }));
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.2, 1.1), new THREE.MeshStandardMaterial({ color: 0xbfd6d3, roughness: 0.3, transparent: true, opacity: 0.9 })); // 민트빛 유리문
   door.position.set(ROOM.w / 2 - 0.04, 1.1, 3.5); scene.add(door);
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 12), matSteel); knob.position.set(ROOM.w / 2 - 0.1, 1.05, 3.1); scene.add(knob);
   const exitSign = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.16, 0.5), new THREE.MeshStandardMaterial({ color: 0x3a7a5a, emissive: 0x2ecc71, emissiveIntensity: 0.6 }));
@@ -228,6 +250,28 @@ function buildRoom() {
   [[-0.32, -0.2], [0.32, -0.2], [-0.32, 0.2], [0.32, 0.2]].forEach(([x, z]) => { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.85, 8), matSteel); leg.position.set(x, 0.425, z); cart.add(leg); });
   for (let i = 0; i < 4; i++) { const vial = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.12, 10), matGlass); vial.position.set(-0.2 + i * 0.13, 0.93, 0); cart.add(vial); const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.03, 10), matBlanket); cap.position.set(-0.2 + i * 0.13, 1.0, 0); cart.add(cap); }
   cart.position.set(ROOM.w / 2 - 1.2, 0, 1.2); cart.traverse(o => { o.castShadow = true; }); scene.add(cart);
+
+  // 창문 + 쉬어 커튼 (오른벽 뒤쪽 구간) — 실제 라인온 대기실 창가 느낌
+  const win = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 2.6), new THREE.MeshBasicMaterial({ color: 0xfff6e3 })); win.position.set(ROOM.w / 2 - 0.02, 1.6, -2.6); win.rotation.y = -Math.PI / 2; scene.add(win);
+  const curtainGeo = new THREE.PlaneGeometry(4.8, 2.9, 48, 1); const cp = curtainGeo.attributes.position;
+  for (let i = 0; i < cp.count; i++) cp.setZ(i, Math.sin(cp.getX(i) * 6) * 0.06);
+  curtainGeo.computeVertexNormals();
+  const curtain = new THREE.Mesh(curtainGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.82, side: THREE.DoubleSide }));
+  curtain.position.set(ROOM.w / 2 - 0.12, 1.55, -2.6); curtain.rotation.y = -Math.PI / 2; scene.add(curtain);
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 5), new THREE.MeshStandardMaterial({ color: 0xf2ece2 })); rail.position.set(ROOM.w / 2 - 0.12, ROOM.h - 0.05, -2.6); scene.add(rail);
+  // 부클레 소파 (베이지) — 입구 쪽
+  const boucle = new THREE.MeshStandardMaterial({ color: 0xb9a68c, roughness: 1 });
+  const sofa = new THREE.Group();
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.42, 1.0), boucle); seat.position.y = 0.21; sofa.add(seat);
+  const back = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 3.0, 20), boucle); back.rotation.z = Math.PI / 2; back.position.set(0, 0.62, -0.36); sofa.add(back);
+  const side = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.42, 1.0), boucle); side.position.set(2.0, 0.21, 0); sofa.add(side);
+  const bolster = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 1.0, 20), boucle); bolster.rotation.x = Math.PI / 2; bolster.position.set(2.0, 0.6, 0); sofa.add(bolster);
+  sofa.traverse(o => { o.castShadow = o.receiveShadow = true; }); sofa.position.set(-ROOM.w / 2 + 2.2, 0, ROOM.d / 2 - 0.9); scene.add(sofa);
+  // 리셉션 데스크 (곡면 느낌의 둥근 박스) + 간접조명
+  const desk = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.3, 1.05, 40, 1, false, Math.PI, Math.PI), new THREE.MeshStandardMaterial({ color: 0xe3d7c3, roughness: 0.8 }));
+  desk.position.set(ROOM.w / 2 - 1.6, 0.525, ROOM.d / 2 - 1.3); desk.castShadow = true; scene.add(desk);
+  const deskTop = new THREE.Mesh(new THREE.CylinderGeometry(1.32, 1.32, 0.05, 40, 1, false, Math.PI, Math.PI), new THREE.MeshStandardMaterial({ color: 0xf2ece2, roughness: 0.5 })); deskTop.position.set(ROOM.w / 2 - 1.6, 1.07, ROOM.d / 2 - 1.3); scene.add(deskTop);
+  const deskLight = new THREE.PointLight(0xffd9a8, 6, 4, 2); deskLight.position.set(ROOM.w / 2 - 1.6, 0.3, ROOM.d / 2 - 2.4); scene.add(deskLight);
 
   // 화분
   const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.2, 0.4, 16), new THREE.MeshStandardMaterial({ color: 0xd9cbb8, roughness: 1 })); pot.position.set(-ROOM.w / 2 + 0.8, 0.2, ROOM.d / 2 - 0.8); scene.add(pot);

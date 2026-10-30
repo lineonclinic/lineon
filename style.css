@@ -76,3 +76,6 @@ body.lying #foot{display:none}
 
 @media (max-width:480px){ .brand-text small{display:none} .pill{padding:7px 10px;font-size:11px} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+
+#credit{position:fixed;left:max(14px,var(--sal));bottom:calc(14px + var(--sab));z-index:9;font-size:10px;color:var(--muted);letter-spacing:.04em;opacity:.8}
+body.lying #credit{display:none}

@@ -385,12 +385,20 @@ function audioStart() {
   if (ac) { ac.resume().catch(() => {}); return; }
   ac = new (window.AudioContext || window.webkitAudioContext)(); ac.resume().catch(() => {});
   bgmGain = ac.createGain(); bgmGain.gain.value = 0; bgmGain.connect(ac.destination);
-  if (CFG.bgm) {
-    bgm = new Audio(CFG.bgm); bgm.loop = true; bgm.crossOrigin = 'anonymous';
-    bgm.addEventListener('canplay', () => { try { const src = ac.createMediaElementSource(bgm); src.connect(bgmGain); bgm.play().catch(() => {}); audioApply(); } catch (e) {} }, { once: true });
-    bgm.addEventListener('error', () => { bgm = null; }, { once: true });
-    bgm.load();
-  }
+  const list = Array.isArray(CFG.bgm) ? CFG.bgm : (CFG.bgm ? [{ src: CFG.bgm, credit: '' }] : []);
+  let i = 0;
+  const tryNext = () => {
+    if (i >= list.length) { bgm = null; return; }
+    const item = list[i++]; const a = new Audio(); a.loop = true; a.crossOrigin = 'anonymous'; a.preload = 'auto';
+    a.addEventListener('canplay', () => {
+      try { const src = ac.createMediaElementSource(a); src.connect(bgmGain); } catch (e) {}
+      bgm = a; a.play().catch(() => {}); audioApply();
+      const cr = $('#credit'); if (cr) { cr.textContent = item.credit ? '♪ ' + item.credit : ''; cr.hidden = !item.credit; }
+    }, { once: true });
+    a.addEventListener('error', tryNext, { once: true });
+    a.src = item.src; a.load();
+  };
+  tryNext();
   document.addEventListener('pointerdown', () => ac.resume().catch(() => {}), { passive: true });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) ac.resume().catch(() => {}); });
 }

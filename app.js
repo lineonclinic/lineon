@@ -128,9 +128,17 @@ function buildRoom() {
     const spot = new THREE.SpotLight(0xffd9b3, 30, 9, 0.5, 0.6, 1.2); spot.position.set(0, ROOM.h - 0.1, -ROOM.d / 2 + 2.2); spot.target.position.set(0, 1.8, -ROOM.d / 2); scene.add(spot, spot.target);
   };
 
-  // 메뉴 보드 (왼벽)
-  const board = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.2, 2.2), new THREE.MeshStandardMaterial({ color: 0x0f1112, roughness: 0.6 }));
-  board.position.set(-ROOM.w / 2 + 0.03, 1.7, -1.5); scene.add(board);
+  // 이벤트 포스터 (왼벽) — assets/event.png
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.9, 1.78), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
+  frame.position.set(-ROOM.w / 2 + 0.03, 1.75, -1.5); frame.castShadow = true; scene.add(frame);
+  new THREE.TextureLoader().load('assets/event.png', tex => {
+    tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+    const ar = tex.image.width / tex.image.height; const h = 1.72, w = h * ar;
+    const poster = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
+    poster.position.set(-ROOM.w / 2 + 0.07, 1.75, -1.5); poster.rotation.y = Math.PI / 2; scene.add(poster);
+  });
+  const pspot = new THREE.SpotLight(0xffe9d2, 25, 7, 0.55, 0.6, 1.2); pspot.position.set(-ROOM.w / 2 + 1.8, ROOM.h - 0.1, -1.5); pspot.target.position.set(-ROOM.w / 2, 1.6, -1.5); scene.add(pspot, pspot.target);
+  // 작은 메뉴 보드는 포스터 옆으로 (오른쪽 벽)
   const bc = document.createElement('canvas'); bc.width = 1024; bc.height = 560; const bg = bc.getContext('2d');
   bg.fillStyle = '#0f1112'; bg.fillRect(0, 0, 1024, 560);
   bg.fillStyle = '#EA660D'; bg.fillRect(60, 60, 8, 440);
@@ -139,8 +147,10 @@ function buildRoom() {
   bg.fillStyle = '#f1ece4'; bg.font = '400 34px "Noto Sans KR", sans-serif';
   BOOSTERS.forEach((b, i) => { bg.fillText(b.n, 100, 180 + i * 66); bg.fillStyle = '#9aa0a3'; bg.font = '300 24px "Noto Sans KR", sans-serif'; bg.fillText(b.d, 560, 186 + i * 66); bg.fillStyle = '#f1ece4'; bg.font = '400 34px "Noto Sans KR", sans-serif'; });
   const btex = new THREE.CanvasTexture(bc); btex.colorSpace = THREE.SRGBColorSpace;
-  const bplane = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.15), new THREE.MeshBasicMaterial({ map: btex }));
-  bplane.position.set(-ROOM.w / 2 + 0.07, 1.7, -1.5); bplane.rotation.y = Math.PI / 2; scene.add(bplane);
+  const board = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.0, 1.85), new THREE.MeshStandardMaterial({ color: 0x0f1112, roughness: 0.6 }));
+  board.position.set(ROOM.w / 2 - 0.03, 1.7, -2.2); scene.add(board);
+  const bplane = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 0.96), new THREE.MeshBasicMaterial({ map: btex }));
+  bplane.position.set(ROOM.w / 2 - 0.07, 1.7, -2.2); bplane.rotation.y = -Math.PI / 2; scene.add(bplane);
 
   // 문 (오른벽) — 간호사 등장
   const door = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.2, 1.1), new THREE.MeshStandardMaterial({ color: 0x3a3330, roughness: 0.7 }));

@@ -91,8 +91,8 @@ const matSteel = new THREE.MeshStandardMaterial({ color: 0xcfd6d9, roughness: 0.
 
 /* ---------- 이벤트 포스터 캔버스 ---------- */
 const EVENT = {
-  month: '11월', title: '이벤트', sub: '첫 방문 체험가', pkg: '포텐자 패키지',
-  perks: [['부가세', '포함'], ['포텐자', '500샷 포함'], ['수면마취', '포함 · 선택 가능'], ['포텐자 팁', '모공 / 펌핑 선택']],
+  title: '11월 특별 패키지', titleSub: '(부가세 포함)',
+  perks: [['포텐자 500샷', '포함'], ['수면마취', '포함 · 선택 가능'], ['포텐자 팁', '모공 / 펌핑 선택']],
   items: [
     ['포텐자 + 리투오 + 물광 3cc', '탄력 · 모공 · 물광 한 번에', '55'],
     ['포텐자 + 리쥬란 4cc', '피부 재생 · 결 개선', '55'],
@@ -101,45 +101,46 @@ const EVENT = {
   ],
   foot: '문의는 카카오톡 상담하기로',
 };
+const POSTER_W = 2048, POSTER_H = 2560;
 function eventPosterCanvas() {
-  const W = 1600, H = 2130; const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
-  const F = '"Noto Sans KR", -apple-system, sans-serif'; const OR = '#EA660D';
+  const W = POSTER_W, H = POSTER_H; const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const F = '"Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'; const OR = '#EA660D';
   g.fillStyle = '#f7f3ec'; g.fillRect(0, 0, W, H);
-  // 헤더
-  g.fillStyle = OR; g.font = `700 150px ${F}`; g.textBaseline = 'top'; g.fillText(EVENT.month, 80, 70);
-  g.font = `500 96px ${F}`; g.fillText(EVENT.title, 84, 232);
-  // 특전 4칸
-  const px0 = 560, pw = (W - px0 - 80) / 4;
-  for (let i = 0; i < 4; i++) {
-    const x = px0 + i * pw;
-    if (i) { g.strokeStyle = '#e5ddd0'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, 90); g.lineTo(x, 330); g.stroke(); }
-    g.fillStyle = OR; g.beginPath(); g.arc(x + pw / 2, 150, 34, 0, Math.PI * 2); g.fill();
-    g.fillStyle = '#f7f3ec'; g.font = `700 36px ${F}`; g.textAlign = 'center'; g.fillText(String(i + 1), x + pw / 2, 131);
-    g.fillStyle = '#2b2522'; g.font = `500 40px ${F}`; g.fillText(EVENT.perks[i][0], x + pw / 2, 212);
-    g.fillStyle = '#6b625b'; g.font = `400 30px ${F}`; g.fillText(EVENT.perks[i][1], x + pw / 2, 268); g.textAlign = 'left';
-  }
-  // 타이틀
-  g.fillStyle = '#6b625b'; g.font = `400 44px ${F}`; g.fillText(EVENT.sub, 84, 420);
-  g.fillStyle = OR; g.font = `700 120px ${F}`; g.fillText(EVENT.pkg, 80, 470);
-  // 카드
-  const cy = 660, ch = 1140; g.fillStyle = '#ffffff'; g.shadowColor = 'rgba(0,0,0,.08)'; g.shadowBlur = 40; g.shadowOffsetY = 12; roundRect(g, 80, cy, W - 160, ch, 28); g.fill(); g.shadowColor = 'transparent';
+  g.textBaseline = 'alphabetic';
+  // 제목
+  g.fillStyle = OR; g.font = `700 190px ${F}`; g.fillText(EVENT.title, 110, 300);
+  g.fillStyle = '#6b625b'; g.font = `500 78px ${F}`; g.fillText(EVENT.titleSub, 118, 410);
+  g.fillStyle = OR; g.fillRect(110, 470, 260, 10);
+  // 특전 3칸
+  const py = 560, ph = 300, pw = (W - 220) / 3;
+  g.fillStyle = '#ffffff'; roundRect(g, 110, py, W - 220, ph, 30); g.fill();
+  EVENT.perks.forEach(([a, b], i) => {
+    const x = 110 + i * pw;
+    if (i) { g.strokeStyle = '#eee7dc'; g.lineWidth = 4; g.beginPath(); g.moveTo(x, py + 50); g.lineTo(x, py + ph - 50); g.stroke(); }
+    g.fillStyle = OR; g.beginPath(); g.arc(x + pw / 2, py + 86, 30, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#fff'; g.font = `700 34px ${F}`; g.textAlign = 'center'; g.fillText('✓', x + pw / 2, py + 99);
+    g.fillStyle = '#2b2522'; g.font = `700 66px ${F}`; g.fillText(a, x + pw / 2, py + 200);
+    g.fillStyle = '#7a716a'; g.font = `400 46px ${F}`; g.fillText(b, x + pw / 2, py + 262); g.textAlign = 'left';
+  });
+  // 패키지 카드
+  const cy = 940, ch = 1300; g.fillStyle = '#ffffff'; roundRect(g, 110, cy, W - 220, ch, 30); g.fill();
   const rh = ch / 4;
   EVENT.items.forEach(([n, d, p], i) => {
-    const y = cy + i * rh;
-    if (i) { g.strokeStyle = '#eee7dc'; g.lineWidth = 3; g.beginPath(); g.moveTo(130, y); g.lineTo(W - 130, y); g.stroke(); }
-    g.fillStyle = OR; g.font = `500 40px ${F}`; g.fillText(String(i + 1).padStart(2, '0'), 150, y + rh / 2 - 26);
-    g.fillStyle = '#e7dfd3'; g.fillRect(240, y + rh / 2 - 60, 3, 120);
-    g.fillStyle = '#2b2522'; g.font = `700 60px ${F}`; g.fillText(n, 290, y + rh / 2 - 70);
-    g.fillStyle = '#7a716a'; g.font = `400 36px ${F}`; g.fillText(d, 292, y + rh / 2 + 16);
-    g.textAlign = 'right'; g.fillStyle = OR; g.font = `700 110px ${F}`; g.fillText(p, W - 270, y + rh / 2 - 66);
-    g.font = `500 56px ${F}`; g.fillText('만원', W - 150, y + rh / 2 - 8); g.textAlign = 'left';
+    const y = cy + i * rh, mid = y + rh / 2;
+    if (i) { g.strokeStyle = '#eee7dc'; g.lineWidth = 4; g.beginPath(); g.moveTo(170, y); g.lineTo(W - 170, y); g.stroke(); }
+    g.fillStyle = OR; g.font = `500 54px ${F}`; g.fillText(String(i + 1).padStart(2, '0'), 190, mid + 18);
+    g.fillStyle = '#e7dfd3'; g.fillRect(300, mid - 90, 4, 180);
+    g.fillStyle = "#2b2522"; g.font = `700 72px ${F}`; g.fillText(n, 360, mid - 10);
+    g.fillStyle = '#7a716a'; g.font = `400 50px ${F}`; g.fillText(d, 364, mid + 72);
+    g.textAlign = "right"; g.fillStyle = OR; g.font = `700 140px ${F}`; g.fillText(p, W - 330, mid + 44);
+    g.font = `500 70px ${F}`; g.fillText('만원', W - 180, mid + 44); g.textAlign = 'left';
   });
   // 푸터: 카카오톡 상담
-  const fy = cy + ch + 70; g.fillStyle = '#FEE500'; roundRect(g, 80, fy, W - 160, 150, 75); g.fill();
-  g.fillStyle = '#191919'; g.beginPath(); g.arc(200, fy + 75, 34, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#FEE500'; g.beginPath(); g.ellipse(200, fy + 72, 20, 16, 0, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#191919'; g.font = `700 54px ${F}`; g.textBaseline = 'middle'; g.fillText(EVENT.foot, 270, fy + 75); g.textBaseline = 'top';
-  g.fillStyle = '#9a918a'; g.font = `400 28px ${F}`; g.textAlign = 'center'; g.fillText('라인온의원 · LINE ON CLINIC', W / 2, fy + 185); g.textAlign = 'left';
+  const fy = cy + ch + 70, fh = 170; g.fillStyle = '#FEE500'; roundRect(g, 110, fy, W - 220, fh, fh / 2); g.fill();
+  g.fillStyle = '#191919'; g.beginPath(); g.arc(250, fy + fh / 2, 40, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#FEE500'; g.beginPath(); g.ellipse(250, fy + fh / 2 - 3, 23, 18, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#191919'; g.font = `700 74px ${F}`; g.fillText(EVENT.foot, 330, fy + fh / 2 + 26);
+  g.fillStyle = '#9a918a'; g.font = `400 40px ${F}`; g.textAlign = 'center'; g.fillText('라인온의원 · LINE ON CLINIC', W / 2, H - 60); g.textAlign = 'left';
   return c;
 }
 
@@ -184,13 +185,15 @@ function buildRoom() {
   };
 
   // 이벤트 포스터 (왼벽) — 캔버스로 직접 그림 (선명하게)
-  const PH = 2.9, PW = PH * (1600 / 2130);
+  const PH = 2.9, PW = PH * (POSTER_W / POSTER_H);
   const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, PH + 0.1, PW + 0.1), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
   frame.position.set(-ROOM.w / 2 + 0.03, 0.25 + PH / 2, -1.2); frame.castShadow = true; scene.add(frame);
   const posterMesh = new THREE.Mesh(new THREE.PlaneGeometry(PW, PH), new THREE.MeshBasicMaterial({ color: 0xf7f3ec }));
   posterMesh.position.set(-ROOM.w / 2 + 0.07, 0.25 + PH / 2, -1.2); posterMesh.rotation.y = Math.PI / 2; posterMesh.name = 'poster'; scene.add(posterMesh);
-  const drawPoster = () => { const cv = eventPosterCanvas(); const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; posterMesh.material = new THREE.MeshBasicMaterial({ map: tex }); $('#posterImg').src = cv.toDataURL('image/png'); };
-  drawPoster(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawPoster); // 폰트 로드 후 한 번 더 (한글 선명)
+  const drawPoster = () => { const cv = eventPosterCanvas(); const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy(); tex.minFilter = THREE.LinearMipmapLinearFilter; tex.generateMipmaps = true; posterMesh.material = new THREE.MeshBasicMaterial({ map: tex }); $('#posterImg').src = cv.toDataURL('image/png'); };
+  drawPoster();
+  // 웹폰트가 실제로 로드된 뒤 다시 그려야 한글이 선명함
+  if (document.fonts) { document.fonts.load('700 100px "Noto Sans KR"').then(drawPoster).catch(() => {}); document.fonts.ready.then(drawPoster); }
   const pspot = new THREE.SpotLight(0xffe9d2, 30, 8, 0.6, 0.6, 1.2); pspot.position.set(-ROOM.w / 2 + 2.2, ROOM.h - 0.1, -1.2); pspot.target.position.set(-ROOM.w / 2, 1.6, -1.2); scene.add(pspot, pspot.target);
 
   // 작은 메뉴 보드는 포스터 옆으로 (오른쪽 벽)

@@ -43,12 +43,12 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.9;
+renderer.toneMappingExposure = 0.72;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xd9cdb8);
-scene.fog = new THREE.Fog(0xd9cdb8, 22, 40);
+scene.background = new THREE.Color(0xbdb09a);
+scene.fog = new THREE.Fog(0xbdb09a, 22, 40);
 
 const camera = new THREE.PerspectiveCamera(50, 1, 0.05, 80);
 const cam = { yaw: 0, pitch: 0.42, dist: 7, target: new THREE.Vector3(0, 1, 2) };
@@ -83,9 +83,9 @@ function stoneTexture() { // 크림색 대형 타일 (실제 라인온 바닥 �
   const tex = new THREE.CanvasTexture(c); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(ROOM.w / 2.4, ROOM.d / 2.4); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; return tex;
 }
 const matFloor = new THREE.MeshStandardMaterial({ map: stoneTexture(), roughness: 0.55, metalness: 0.02 });
-const matWall = new THREE.MeshStandardMaterial({ color: 0xcbbda4, roughness: 0.95 });          // 베이지 스타코
+const matWall = new THREE.MeshStandardMaterial({ color: 0xbfb097, roughness: 0.95 });          // 베이지 스타코
 const matWallAccent = new THREE.MeshStandardMaterial({ color: 0xcdbfa7, roughness: 0.9 });    // 로고 벽 (대리석 톤)
-const matCeil = new THREE.MeshStandardMaterial({ color: 0xe8e0d2, roughness: 1 });
+const matCeil = new THREE.MeshStandardMaterial({ color: 0xd9d0c0, roughness: 1 });
 const matFrame = new THREE.MeshStandardMaterial({ color: 0xa89c89, roughness: 0.7, metalness: 0.1 }); // 베드 프레임 (웜 그레이)
 const matMattress = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.9 });
 const matPillow = new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.95 });
@@ -162,7 +162,7 @@ function buildRoom() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), matFloor);
   floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; floor.name = 'floor'; scene.add(floor);
 
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0xcdc1aa, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0xa89b85, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
   const ceil = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), matCeil);
   ceil.rotation.x = Math.PI / 2; ceil.position.y = ROOM.h; scene.add(ceil);
 
@@ -184,10 +184,10 @@ function buildRoom() {
   const coveMat = new THREE.MeshStandardMaterial({ color: 0xffe9c8, emissive: 0xffd9a8, emissiveIntensity: 1.2 });
   const coveN = new THREE.Mesh(new THREE.BoxGeometry(ROOM.w - 0.4, 0.04, 0.08), coveMat); coveN.position.set(0, ROOM.h - 0.12, -ROOM.d / 2 + 0.35); scene.add(coveN);
   const coveS = coveN.clone(); coveS.position.z = ROOM.d / 2 - 0.35; scene.add(coveS);
-  scene.add(new THREE.AmbientLight(0xfff1e0, 0.35));
-  const hemi = new THREE.HemisphereLight(0xfff4e6, 0xb9ab92, 0.45); scene.add(hemi);
+  scene.add(new THREE.AmbientLight(0xffe9d2, 0.18));
+  const hemi = new THREE.HemisphereLight(0xffeedb, 0x8f8470, 0.3); scene.add(hemi);
   // 창문 쪽 햇살 (오른벽 앞부분)
-  const sun = new THREE.DirectionalLight(0xffe7c4, 1.1); sun.position.set(ROOM.w / 2 + 4, ROOM.h + 2, -1); sun.target.position.set(0, 0, 0); sun.castShadow = true;
+  const sun = new THREE.DirectionalLight(0xffe0b8, 0.9); sun.position.set(ROOM.w / 2 + 4, ROOM.h + 2, -1); sun.target.position.set(0, 0, 0); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = -10; sun.shadow.camera.right = 10; sun.shadow.camera.top = 10; sun.shadow.camera.bottom = -10; sun.shadow.bias = -0.0015; scene.add(sun, sun.target);
 
   // 뒷벽 로고 (SVG → 텍스처), 은은하게

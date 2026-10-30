@@ -109,7 +109,7 @@ function eventPosterCanvas() {
   g.textBaseline = 'alphabetic';
   // 제목
   g.fillStyle = OR; g.font = `700 190px ${F}`; g.fillText(EVENT.title, 110, 300);
-  g.fillStyle = '#6b625b'; g.font = `500 78px ${F}`; g.fillText(EVENT.titleSub, 118, 410);
+  g.fillStyle = '#4a423d'; g.font = `500 78px ${F}`; g.fillText(EVENT.titleSub, 118, 410);
   g.fillStyle = OR; g.fillRect(110, 470, 260, 10);
   // 특전 3칸
   const py = 560, ph = 300, pw = (W - 220) / 3;
@@ -120,7 +120,7 @@ function eventPosterCanvas() {
     g.fillStyle = OR; g.beginPath(); g.arc(x + pw / 2, py + 86, 30, 0, Math.PI * 2); g.fill();
     g.fillStyle = '#fff'; g.font = `700 34px ${F}`; g.textAlign = 'center'; g.fillText('✓', x + pw / 2, py + 99);
     g.fillStyle = '#2b2522'; g.font = `700 66px ${F}`; g.fillText(a, x + pw / 2, py + 200);
-    g.fillStyle = '#7a716a'; g.font = `400 46px ${F}`; g.fillText(b, x + pw / 2, py + 262); g.textAlign = 'left';
+    g.fillStyle = OR; g.font = `500 50px ${F}`; g.fillText(b, x + pw / 2, py + 264); g.textAlign = 'left';
   });
   // 패키지 카드
   const cy = 940, ch = 1300; g.fillStyle = '#ffffff'; roundRect(g, 110, cy, W - 220, ch, 30); g.fill();
@@ -131,7 +131,7 @@ function eventPosterCanvas() {
     g.fillStyle = OR; g.font = `500 54px ${F}`; g.fillText(String(i + 1).padStart(2, '0'), 190, mid + 18);
     g.fillStyle = '#e7dfd3'; g.fillRect(300, mid - 90, 4, 180);
     g.fillStyle = "#2b2522"; g.font = `700 72px ${F}`; g.fillText(n, 360, mid - 10);
-    g.fillStyle = '#7a716a'; g.font = `400 50px ${F}`; g.fillText(d, 364, mid + 72);
+    g.fillStyle = '#4a423d'; g.font = `500 50px ${F}`; g.fillText(d, 364, mid + 72);
     g.textAlign = "right"; g.fillStyle = OR; g.font = `700 140px ${F}`; g.fillText(p, W - 330, mid + 44);
     g.font = `500 70px ${F}`; g.fillText('만원', W - 180, mid + 44); g.textAlign = 'left';
   });

@@ -232,9 +232,9 @@ function buildRoom() {
   BOOSTERS.forEach((b, i) => { bg.fillText(b.n, 100, 180 + i * 66); bg.fillStyle = '#6b625b'; bg.font = '400 24px "Noto Sans KR", sans-serif'; bg.fillText(b.d, 560, 186 + i * 66); bg.fillStyle = '#2b2522'; bg.font = '500 34px "Noto Sans KR", sans-serif'; });
   const btex = new THREE.CanvasTexture(bc); btex.colorSpace = THREE.SRGBColorSpace;
   const board = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.0, 1.85), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
-  board.position.set(ROOM.w / 2 - 0.03, 1.7, -2.2); scene.add(board);
+  board.position.set(ROOM.w / 2 - 0.03, 1.7, 1.6); scene.add(board); // 창문과 문 사이
   const bplane = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 0.96), new THREE.MeshBasicMaterial({ map: btex }));
-  bplane.position.set(ROOM.w / 2 - 0.07, 1.7, -2.2); bplane.rotation.y = -Math.PI / 2; scene.add(bplane);
+  bplane.position.set(ROOM.w / 2 - 0.07, 1.7, 1.6); bplane.rotation.y = -Math.PI / 2; scene.add(bplane);
 
   // 문 (오른벽) — 간호사 등장
   const door = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.2, 1.1), new THREE.MeshStandardMaterial({ color: 0xbfd6d3, roughness: 0.3, transparent: true, opacity: 0.9 })); // 민트빛 유리문
@@ -249,14 +249,14 @@ function buildRoom() {
   const shelf = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 0.45), matSteel); shelf.position.y = 0.4; cart.add(shelf);
   [[-0.32, -0.2], [0.32, -0.2], [-0.32, 0.2], [0.32, 0.2]].forEach(([x, z]) => { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.85, 8), matSteel); leg.position.set(x, 0.425, z); cart.add(leg); });
   for (let i = 0; i < 4; i++) { const vial = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.12, 10), matGlass); vial.position.set(-0.2 + i * 0.13, 0.93, 0); cart.add(vial); const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.03, 10), matBlanket); cap.position.set(-0.2 + i * 0.13, 1.0, 0); cart.add(cap); }
-  cart.position.set(ROOM.w / 2 - 1.2, 0, 1.2); cart.traverse(o => { o.castShadow = true; }); scene.add(cart);
+  cart.position.set(ROOM.w / 2 - 1.0, 0, 0.1); cart.traverse(o => { o.castShadow = true; }); scene.add(cart);
 
   // 창문 + 쉬어 커튼 (오른벽 뒤쪽 구간) — 실제 라인온 대기실 창가 느낌
   const win = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 2.6), new THREE.MeshBasicMaterial({ color: 0xfff6e3 })); win.position.set(ROOM.w / 2 - 0.02, 1.6, -2.6); win.rotation.y = -Math.PI / 2; scene.add(win);
   const curtainGeo = new THREE.PlaneGeometry(4.8, 2.9, 48, 1); const cp = curtainGeo.attributes.position;
-  for (let i = 0; i < cp.count; i++) cp.setZ(i, Math.sin(cp.getX(i) * 6) * 0.06);
+  for (let i = 0; i < cp.count; i++) cp.setZ(i, Math.sin(cp.getX(i) * 9) * 0.09);
   curtainGeo.computeVertexNormals();
-  const curtain = new THREE.Mesh(curtainGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.82, side: THREE.DoubleSide }));
+  const curtain = new THREE.Mesh(curtainGeo, new THREE.MeshStandardMaterial({ color: 0xfffaf2, roughness: 1, transparent: true, opacity: 0.75, side: THREE.DoubleSide }));
   curtain.position.set(ROOM.w / 2 - 0.12, 1.55, -2.6); curtain.rotation.y = -Math.PI / 2; scene.add(curtain);
   const rail = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 5), new THREE.MeshStandardMaterial({ color: 0xf2ece2 })); rail.position.set(ROOM.w / 2 - 0.12, ROOM.h - 0.05, -2.6); scene.add(rail);
   // 부클레 소파 (베이지) — 입구 쪽

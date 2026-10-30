@@ -82,7 +82,11 @@ const matMattress = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness:
 const matPillow = new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.95 });
 const matBlanket = new THREE.MeshStandardMaterial({ color: 0xea660d, roughness: 0.85 });
 const matSkin = new THREE.MeshStandardMaterial({ color: 0xf3d7c5, roughness: 0.8 });
-const matGown = new THREE.MeshStandardMaterial({ color: 0xdfe6e8, roughness: 0.9 });
+const matGown = new THREE.MeshStandardMaterial({ color: 0xf3ebdf, roughness: 0.9 }); // 라인온 가운 (크림)
+// 가슴 로고 (SVG → 텍스처, 모든 아바타가 공유)
+const logoTex = new THREE.Texture(); logoTex.colorSpace = THREE.SRGBColorSpace;
+{ const img = new Image(); img.src = 'assets/mark_lineon_ps.svg'; img.onload = () => { const c = document.createElement('canvas'); c.width = 256; c.height = 512; const g = c.getContext('2d'); const r = Math.min(220 / img.width, 480 / img.height); const w = img.width * r, h = img.height * r; g.drawImage(img, (256 - w) / 2, (512 - h) / 2, w, h); logoTex.image = c; logoTex.needsUpdate = true; }; }
+const matLogo = new THREE.MeshBasicMaterial({ map: logoTex, transparent: true, depthWrite: false });
 const matNurse = new THREE.MeshStandardMaterial({ color: 0xf7f7f5, roughness: 0.9 });
 const matDark = new THREE.MeshStandardMaterial({ color: 0x2a2420, roughness: 0.9 });
 const matGlass = new THREE.MeshStandardMaterial({ color: 0xbfe6ee, transparent: true, opacity: 0.35, roughness: 0.2 });
@@ -273,7 +277,10 @@ function makeAvatar({ color = '#EA660D', nurse = false, name = '' } = {}) {
   const bodyMat = nurse ? matNurse : matGown;
   const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 0.5, 6, 14), bodyMat); body.position.y = 0.62; body.castShadow = true; g.add(body);
   // 환자복 포인트 (가슴 띠) / 간호사 명찰
-  const strip = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.08, 0.1), new THREE.MeshStandardMaterial({ color: nurse ? 0xea660d : new THREE.Color(color), roughness: 0.8 })); strip.position.set(0, 0.78, 0.2); g.add(strip);
+  // 라인온 가운: 오렌지 파이핑 + 가슴 로고
+  const strip = new THREE.Mesh(new THREE.TorusGeometry(0.215, 0.012, 8, 32), new THREE.MeshStandardMaterial({ color: 0xea660d, roughness: 0.8 })); strip.rotation.x = Math.PI / 2; strip.position.y = 0.9; g.add(strip);
+  const patch = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.24), matLogo); patch.position.set(0.09, 0.72, 0.205); patch.rotation.y = 0.4; g.add(patch);
+  if (!nurse) { const tag = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.022, 0.012), new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: 0.8 })); tag.position.set(-0.11, 0.78, 0.205); tag.rotation.y = -0.45; g.add(tag); } // 손님별 색 리본
   const headG = new THREE.Group(); headG.position.y = 1.22; g.add(headG); g.userData.headG = headG;
   const head = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 20), matSkin); head.castShadow = true; headG.add(head);
   // 눈

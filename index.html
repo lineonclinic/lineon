@@ -14,7 +14,7 @@
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <canvas id="gl"></canvas>
@@ -38,6 +38,7 @@
   </div>
   <div class="hud-right">
     <span class="pill" id="count" title="지금 접속한 사람">👤 <b>1</b></span>
+    <span class="pill" id="today" title="오늘 방문자" hidden>오늘 <b>0</b></span>
     <span class="pill" id="shots" title="오늘 누적 샷">샷 <b>0</b></span>
     <button class="pill btn" id="mute" aria-pressed="false" title="소리">♪</button>
   </div>
@@ -68,9 +69,9 @@
 <div id="toast" hidden></div>
 <div id="credit" hidden></div>
 
-<script src="config.js?v=7"></script>
+<script src="config.js?v=8"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.10/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-<script type="module" src="app.js?v=7"></script>
+<script type="module" src="app.js?v=8"></script>
 </body>
 </html>

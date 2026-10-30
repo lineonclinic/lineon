@@ -419,6 +419,15 @@ const net = {
     if (!window.supabase || !CFG.supabaseUrl || !CFG.supabaseKey) { $('#count b').textContent = '1'; return; }
     try { this.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { realtime: { params: { eventsPerSecond: 12 } } }); } catch (e) { return; }
     this.join(1);
+    this.visit();
+  },
+  async visit() { // 오늘 방문자 (브라우저당 하루 1회 집계)
+    const key = 'lineon.visit.' + new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+    let counted = false; try { counted = localStorage.getItem(key) === '1'; } catch (e) {}
+    try {
+      const { data, error } = await this.sb.rpc(counted ? 'today_visits' : 'visit_today');
+      if (!error && typeof data === 'number') { $('#today b').textContent = data.toLocaleString('ko-KR'); $('#today').hidden = false; if (!counted) { try { localStorage.setItem(key, '1'); } catch (e) {} } }
+    } catch (e) {}
   },
   join(n) {
     if (this.ch) { try { this.sb.removeChannel(this.ch); } catch (e) {} }

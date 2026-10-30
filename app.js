@@ -230,7 +230,7 @@ function setAvatarName(g, name) { const old = g.userData.label; g.remove(old); c
 
 /* 눕기 포즈: 베드 위로 올려 눕힘 */
 function poseLying(g, bed) {
-  g.position.set(bed.x, 0.66, bed.z + 0.4);
+  g.position.set(bed.x, 0.92, bed.z + 0.4); // 매트리스 윗면(0.67) + 몸 두께
   g.rotation.set(-Math.PI / 2, 0, 0);
   g.userData.label.position.set(0, 1.5, 0.55); // 로컬 +y=머리쪽(월드 -z), 로컬 +z=월드 위
 }
@@ -504,7 +504,7 @@ function animate(now) {
     camera.lookAt(cam.target);
   } else {
     const b = beds[currentBed];
-    const eye = new THREE.Vector3(b.x, 0.98, b.z - 0.82);
+    const eye = new THREE.Vector3(b.x, 1.02, b.z - 0.82);
     camera.position.lerp(eye, 0.12);
     // 천장을 보되 드래그로 살짝 둘러보기
     let look;

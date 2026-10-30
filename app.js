@@ -421,7 +421,7 @@ const net = {
     this.join(1);
     this.visit();
   },
-  async visit() { // 오늘 방문자 (브라우저당 하루 1회 집계)
+  async visit() { // 누적 방문자 (브라우저당 하루 1회 집계)
     const key = 'lineon.visit.' + new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
     let counted = false; try { counted = localStorage.getItem(key) === '1'; } catch (e) {}
     try {

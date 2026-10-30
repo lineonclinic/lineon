@@ -129,11 +129,11 @@ function buildRoom() {
   };
 
   // 이벤트 포스터 (왼벽) — assets/event.png
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.9, 1.78), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.5, 2.38), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
   frame.position.set(-ROOM.w / 2 + 0.03, 1.75, -1.5); frame.castShadow = true; scene.add(frame);
   new THREE.TextureLoader().load('assets/event.png', tex => {
     tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-    const ar = tex.image.width / tex.image.height; const h = 1.72, w = h * ar;
+    const ar = tex.image.width / tex.image.height; const h = 2.3, w = h * ar;
     const poster = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
     poster.position.set(-ROOM.w / 2 + 0.07, 1.75, -1.5); poster.rotation.y = Math.PI / 2; scene.add(poster);
   });

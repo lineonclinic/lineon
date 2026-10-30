@@ -14,11 +14,11 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => a + Math.random() * (b - a);
 
 const BOOSTERS = [
-  { id: 'glow', n: '글로우 부스터', d: '칙칙함 · 광채', shots: 9 },
-  { id: 'hydra', n: '수분 샤워', d: '건조 · 속당김', shots: 12 },
+  { id: 'glow', n: '스킨부스터', d: '칙칙함 · 광채', shots: 9 },
+  { id: 'hydra', n: '물광', d: '건조 · 속당김', shots: 12 },
   { id: 'lift', n: '탄력 리프트', d: '처짐 · 잔주름', shots: 10 },
   { id: 'pore', n: '모공 타이트', d: '모공 · 피지', shots: 14 },
-  { id: 'calm', n: '홍조 캄', d: '홍조 · 민감', shots: 8 },
+  { id: 'calm', n: '홍조', d: '홍조 · 민감', shots: 8 },
 ];
 const ADJ = ['조용한', '맑은', '포근한', '반짝이는', '느긋한', '수줍은', '산뜻한', '말랑한', '고요한', '졸린'];
 const NOUN = ['빗방울', '복숭아', '구름', '달빛', '솜사탕', '물결', '햇살', '오렌지', '바람', '이슬'];
@@ -327,7 +327,8 @@ async function inject(b) {
   syringe.visible = false; await wait(500);
   say('다 됐어요. 쿨링팩 올려드릴게요.', 2600); await wait(1200);
   me.state = 'cooling'; net.push();
-  coolFade(1); nurse.rotation.set(0, nurse.rotation.y, 0); nurse.position.y = 0; nurse.userData.headG.rotation.x = 0; nurseSide = 0; await moveNurse(new THREE.Vector3(ROOM.w / 2 - 0.6, 0, 3.5)); nurse.visible = false;
+  myAvatar.visible = true; // 쉬는 동안은 위에서 내려다보는 시점이라 내 몸도 보임
+  coolFade(0.6); nurse.rotation.set(0, nurse.rotation.y, 0); nurse.position.y = 0; nurse.userData.headG.rotation.x = 0; nurseSide = 0; await moveNurse(new THREE.Vector3(ROOM.w / 2 - 0.6, 0, 3.5)); nurse.visible = false;
   startRest(); busy = false;
 }
 function moveNurse(dest) {
@@ -487,9 +488,16 @@ function animate(now) {
   beds.forEach(b => { const target = (me.state === 'idle' || me.state === 'walk') && !b.occupant ? 0.35 + Math.sin(now * 0.003) * 0.15 : 0; b.ring.material.opacity = lerp(b.ring.material.opacity, target, 0.1); });
 
   // 카메라
-  const lying = me.state === 'lying' || me.state === 'injecting' || me.state === 'cooling';
+  const lying = me.state === 'lying' || me.state === 'injecting';
+  const cooling = me.state === 'cooling';
   const fovT = lying ? 62 : 50; if (Math.abs(camera.fov - fovT) > 0.1) { camera.fov = lerp(camera.fov, fovT, 0.1); camera.updateProjectionMatrix(); }
-  if (!lying) {
+  if (cooling) {
+    // 쉬는 시점: 내 베드 머리맡 위에서 방 전체를 내려다봄 (다른 사람들 보임)
+    const b = beds[currentBed];
+    const pos = new THREE.Vector3(b.x + lookYaw * 1.5, 2.6, b.z - 2.6 + lookPitch * 1.5);
+    camera.position.lerp(pos, 0.06);
+    const q = new THREE.Quaternion(); const m = new THREE.Matrix4().lookAt(camera.position, new THREE.Vector3(b.x * 0.4, 0.6, b.z + 0.6), new THREE.Vector3(0, 1, 0)); q.setFromRotationMatrix(m); camera.quaternion.slerp(q, 0.06);
+  } else if (!lying) {
     cam.target.lerp(new THREE.Vector3(me.x, 1.0, me.z), 0.12);
     const px = cam.target.x + Math.sin(cam.yaw) * Math.cos(cam.pitch) * cam.dist, pz = cam.target.z + Math.cos(cam.yaw) * Math.cos(cam.pitch) * cam.dist, py = cam.target.y + Math.sin(cam.pitch) * cam.dist;
     camera.position.lerp(new THREE.Vector3(px, clamp(py, 0.6, ROOM.h + 4), pz), 0.12); // 벽은 안쪽면만 그려서 바깥에서 들여다볼 수 있음
@@ -499,9 +507,11 @@ function animate(now) {
     const eye = new THREE.Vector3(b.x, 0.98, b.z - 0.82);
     camera.position.lerp(eye, 0.12);
     // 천장을 보되 드래그로 살짝 둘러보기
-    const look = nurseSide
-      ? new THREE.Vector3(eye.x + nurseSide * 2.2 + lookYaw * 1.2, eye.y + 1.4, eye.z - 0.5 + lookPitch * 1.6)
-      : new THREE.Vector3(eye.x + lookYaw * 1.6, eye.y + 3, eye.z - 0.9 + lookPitch * 2.2);
+    let look;
+    if (nurse.visible) { // 간호사가 보이는 동안은 시선이 간호사를 따라감
+      const hp = nurse.userData.headG.getWorldPosition(new THREE.Vector3()); const dir = hp.clone().sub(eye); const up = new THREE.Vector3(0, 1.8, -0.4);
+      look = eye.clone().add(dir.multiplyScalar(0.55)).add(up).add(new THREE.Vector3(lookYaw * 1.2, 0, lookPitch * 1.2));
+    } else look = new THREE.Vector3(eye.x + lookYaw * 1.6, eye.y + 3, eye.z - 0.9 + lookPitch * 2.2);
     const q = new THREE.Quaternion(); const m = new THREE.Matrix4().lookAt(camera.position, look, new THREE.Vector3(0, 0, -1)); q.setFromRotationMatrix(m); camera.quaternion.slerp(q, 0.16);
     if (joltT > 0) { camera.position.y += Math.sin(joltT * 20) * 0.006 * joltT; joltT = Math.max(0, joltT - dt * 5); }
   }

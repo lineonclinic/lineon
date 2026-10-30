@@ -29,7 +29,7 @@ const PALETTE = ['#EA660D', '#F2A65A', '#9AD3C9', '#C9B8F2', '#F2C5B5', '#B5D6F2
 const me = {
   id: Math.random().toString(36).slice(2, 10),
   name: '', color: PALETTE[(Math.random() * PALETTE.length) | 0],
-  x: 0, z: 4.9, ry: Math.PI, bed: -1, state: 'idle', // idle | walk | lying | injecting | cooling
+  x: rnd(-3.2, 3.2), z: rnd(4.0, 5.4), ry: Math.PI, bed: -1, state: 'idle', // 입구 근처 랜덤 위치 (겹침 방지) // idle | walk | lying | injecting | cooling
 };
  let shotsTotal = 0; 
 try { shotsTotal = +localStorage.getItem('lineon.shots') || 0; } catch (e) {}

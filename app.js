@@ -92,7 +92,7 @@ const matSteel = new THREE.MeshStandardMaterial({ color: 0xcfd6d9, roughness: 0.
 /* ---------- 이벤트 포스터 캔버스 ---------- */
 const EVENT = {
   month: '11월', title: '이벤트', sub: '첫 방문 체험가', pkg: '포텐자 패키지',
-  perks: [['부가세', '포함'], ['포텐자', '500샷 포함'], ['수면마취', '포함 (선택 가능)'], ['포텐자 팁', '모공팁 · 펌핑팁 선택']],
+  perks: [['부가세', '포함'], ['포텐자', '500샷 포함'], ['수면마취', '포함 · 선택 가능'], ['포텐자 팁', '모공 / 펌핑 선택']],
   items: [
     ['포텐자 + 리투오 + 물광 3cc', '탄력 · 모공 · 물광 한 번에', '55'],
     ['포텐자 + 리쥬란 4cc', '피부 재생 · 결 개선', '55'],
@@ -102,7 +102,7 @@ const EVENT = {
   foot: '문의는 카카오톡 상담하기로',
 };
 function eventPosterCanvas() {
-  const W = 1600, H = 2050; const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const W = 1600, H = 2130; const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
   const F = '"Noto Sans KR", -apple-system, sans-serif'; const OR = '#EA660D';
   g.fillStyle = '#f7f3ec'; g.fillRect(0, 0, W, H);
   // 헤더
@@ -184,7 +184,7 @@ function buildRoom() {
   };
 
   // 이벤트 포스터 (왼벽) — 캔버스로 직접 그림 (선명하게)
-  const PH = 2.9, PW = PH * 0.78;
+  const PH = 2.9, PW = PH * (1600 / 2130);
   const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, PH + 0.1, PW + 0.1), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
   frame.position.set(-ROOM.w / 2 + 0.03, 0.25 + PH / 2, -1.2); frame.castShadow = true; scene.add(frame);
   const posterMesh = new THREE.Mesh(new THREE.PlaneGeometry(PW, PH), new THREE.MeshBasicMaterial({ color: 0xf7f3ec }));

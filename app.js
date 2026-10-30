@@ -295,6 +295,11 @@ function makeAvatar({ color = '#EA660D', nurse = false, name = '' } = {}) {
     // 머리카락 (뒤통수 쪽 반구)
     const hair = new THREE.Mesh(new THREE.SphereGeometry(0.27, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2.2), new THREE.MeshStandardMaterial({ color: 0x3b2f2a, roughness: 0.95 })); hair.position.set(0, 0.01, -0.05); hair.rotation.x = -0.35; headG.add(hair);
   }
+  // 팔 + 손
+  [-1, 1].forEach(sx => {
+    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.055, 0.3, 4, 10), bodyMat); arm.position.set(sx * 0.26, 0.62, 0.02); arm.rotation.z = sx * -0.12; arm.castShadow = true; g.add(arm);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 10), nurse ? new THREE.MeshStandardMaterial({ color: 0xdff1f2, roughness: 0.9 }) : matSkin); hand.position.set(sx * 0.285, 0.42, 0.04); g.add(hand);
+  });
   // 발
   [-0.1, 0.1].forEach(x => { const f = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 10), bodyMat); f.scale.set(1, 0.6, 1.3); f.position.set(x, 0.07, 0.04); g.add(f); });
   const label = labelSprite(name || ' ', { size: 0.36 }); label.position.y = 1.72; g.add(label); g.userData.label = label;

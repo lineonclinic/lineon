@@ -477,10 +477,15 @@ function animate(now) {
   // 내 이동
   if (me.state === 'walk' && walk.target) {
     const dx = walk.target.x - me.x, dz = walk.target.z - me.z; const d = Math.hypot(dx, dz);
-    if (d < 0.08) { me.x = walk.target.x; me.z = walk.target.z; const then = walk.target.then; walk.target = null; me.state = 'idle'; net.push(); if (then) then(); }
-    else { const sp = 2.2 * dt; me.x += dx / d * sp; me.z += dz / d * sp; me.ry = Math.atan2(dx, dz); net.pos(); }
-    myAvatar.position.set(me.x, Math.abs(Math.sin(now * 0.012)) * 0.03, me.z);
-    myAvatar.rotation.y = lerpAngle(myAvatar.rotation.y, me.ry, 0.2);
+    if (d < 0.08) {
+      me.x = walk.target.x; me.z = walk.target.z; myAvatar.position.set(me.x, 0, me.z);
+      const then = walk.target.then; walk.target = null; me.state = 'idle'; net.push();
+      if (then) then(); // 눕기 등 — 이후 위치는 then()이 정하므로 여기서 더 건드리지 않음
+    } else {
+      const sp = 2.2 * dt; me.x += dx / d * sp; me.z += dz / d * sp; me.ry = Math.atan2(dx, dz); net.pos();
+      myAvatar.position.set(me.x, Math.abs(Math.sin(now * 0.012)) * 0.03, me.z);
+      myAvatar.rotation.y = lerpAngle(myAvatar.rotation.y, me.ry, 0.2);
+    }
   } else if (me.state === 'idle') { myAvatar.position.y = Math.sin(now * 0.002) * 0.006; }
 
   // 다른 사람 보간

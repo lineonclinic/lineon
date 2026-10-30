@@ -88,6 +88,61 @@ const matDark = new THREE.MeshStandardMaterial({ color: 0x2a2420, roughness: 0.9
 const matGlass = new THREE.MeshStandardMaterial({ color: 0xbfe6ee, transparent: true, opacity: 0.35, roughness: 0.2 });
 const matSteel = new THREE.MeshStandardMaterial({ color: 0xcfd6d9, roughness: 0.3, metalness: 0.8 });
 
+
+/* ---------- 이벤트 포스터 캔버스 ---------- */
+const EVENT = {
+  month: '11월', title: '이벤트', sub: '첫 방문 체험가', pkg: '포텐자 패키지',
+  perks: [['부가세', '포함'], ['포텐자', '500샷 포함'], ['수면마취', '포함 (선택 가능)'], ['포텐자 팁', '모공팁 · 펌핑팁 선택']],
+  items: [
+    ['포텐자 + 리투오 + 물광 3cc', '탄력 · 모공 · 물광 한 번에', '55'],
+    ['포텐자 + 리쥬란 4cc', '피부 재생 · 결 개선', '55'],
+    ['포텐자 + PRP + 물광 3cc', '피부 재생 · 볼륨 · 물광', '44'],
+    ['포텐자 + 스킨보톡스 + 물광 3cc', '모공 · 피지 · 물광 케어', '33'],
+  ],
+  foot: '문의는 카카오톡 상담하기로',
+};
+function eventPosterCanvas() {
+  const W = 1600, H = 2050; const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const F = '"Noto Sans KR", -apple-system, sans-serif'; const OR = '#EA660D';
+  g.fillStyle = '#f7f3ec'; g.fillRect(0, 0, W, H);
+  // 헤더
+  g.fillStyle = OR; g.font = `700 150px ${F}`; g.textBaseline = 'top'; g.fillText(EVENT.month, 80, 70);
+  g.font = `500 96px ${F}`; g.fillText(EVENT.title, 84, 232);
+  // 특전 4칸
+  const px0 = 560, pw = (W - px0 - 80) / 4;
+  for (let i = 0; i < 4; i++) {
+    const x = px0 + i * pw;
+    if (i) { g.strokeStyle = '#e5ddd0'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, 90); g.lineTo(x, 330); g.stroke(); }
+    g.fillStyle = OR; g.beginPath(); g.arc(x + pw / 2, 150, 34, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#f7f3ec'; g.font = `700 36px ${F}`; g.textAlign = 'center'; g.fillText(String(i + 1), x + pw / 2, 131);
+    g.fillStyle = '#2b2522'; g.font = `500 40px ${F}`; g.fillText(EVENT.perks[i][0], x + pw / 2, 212);
+    g.fillStyle = '#6b625b'; g.font = `400 30px ${F}`; g.fillText(EVENT.perks[i][1], x + pw / 2, 268); g.textAlign = 'left';
+  }
+  // 타이틀
+  g.fillStyle = '#6b625b'; g.font = `400 44px ${F}`; g.fillText(EVENT.sub, 84, 420);
+  g.fillStyle = OR; g.font = `700 120px ${F}`; g.fillText(EVENT.pkg, 80, 470);
+  // 카드
+  const cy = 660, ch = 1140; g.fillStyle = '#ffffff'; g.shadowColor = 'rgba(0,0,0,.08)'; g.shadowBlur = 40; g.shadowOffsetY = 12; roundRect(g, 80, cy, W - 160, ch, 28); g.fill(); g.shadowColor = 'transparent';
+  const rh = ch / 4;
+  EVENT.items.forEach(([n, d, p], i) => {
+    const y = cy + i * rh;
+    if (i) { g.strokeStyle = '#eee7dc'; g.lineWidth = 3; g.beginPath(); g.moveTo(130, y); g.lineTo(W - 130, y); g.stroke(); }
+    g.fillStyle = OR; g.font = `500 40px ${F}`; g.fillText(String(i + 1).padStart(2, '0'), 150, y + rh / 2 - 26);
+    g.fillStyle = '#e7dfd3'; g.fillRect(240, y + rh / 2 - 60, 3, 120);
+    g.fillStyle = '#2b2522'; g.font = `700 60px ${F}`; g.fillText(n, 290, y + rh / 2 - 70);
+    g.fillStyle = '#7a716a'; g.font = `400 36px ${F}`; g.fillText(d, 292, y + rh / 2 + 16);
+    g.textAlign = 'right'; g.fillStyle = OR; g.font = `700 110px ${F}`; g.fillText(p, W - 270, y + rh / 2 - 66);
+    g.font = `500 56px ${F}`; g.fillText('만원', W - 150, y + rh / 2 - 8); g.textAlign = 'left';
+  });
+  // 푸터: 카카오톡 상담
+  const fy = cy + ch + 70; g.fillStyle = '#FEE500'; roundRect(g, 80, fy, W - 160, 150, 75); g.fill();
+  g.fillStyle = '#191919'; g.beginPath(); g.arc(200, fy + 75, 34, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#FEE500'; g.beginPath(); g.ellipse(200, fy + 72, 20, 16, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#191919'; g.font = `700 54px ${F}`; g.textBaseline = 'middle'; g.fillText(EVENT.foot, 270, fy + 75); g.textBaseline = 'top';
+  g.fillStyle = '#9a918a'; g.font = `400 28px ${F}`; g.textAlign = 'center'; g.fillText('라인온의원 · LINE ON CLINIC', W / 2, fy + 185); g.textAlign = 'left';
+  return c;
+}
+
 /* ---------- 방 ---------- */
 function buildRoom() {
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM.w, ROOM.d), matFloor);
@@ -128,16 +183,16 @@ function buildRoom() {
     const spot = new THREE.SpotLight(0xffd9b3, 30, 9, 0.5, 0.6, 1.2); spot.position.set(0, ROOM.h - 0.1, -ROOM.d / 2 + 2.2); spot.target.position.set(0, 1.8, -ROOM.d / 2); scene.add(spot, spot.target);
   };
 
-  // 이벤트 포스터 (왼벽) — assets/event.png
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.5, 2.38), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
-  frame.position.set(-ROOM.w / 2 + 0.03, 1.75, -1.5); frame.castShadow = true; scene.add(frame);
-  new THREE.TextureLoader().load('assets/event.png', tex => {
-    tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-    const ar = tex.image.width / tex.image.height; const h = 2.3, w = h * ar;
-    const poster = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
-    poster.position.set(-ROOM.w / 2 + 0.07, 1.75, -1.5); poster.rotation.y = Math.PI / 2; scene.add(poster);
-  });
-  const pspot = new THREE.SpotLight(0xffe9d2, 25, 7, 0.55, 0.6, 1.2); pspot.position.set(-ROOM.w / 2 + 1.8, ROOM.h - 0.1, -1.5); pspot.target.position.set(-ROOM.w / 2, 1.6, -1.5); scene.add(pspot, pspot.target);
+  // 이벤트 포스터 (왼벽) — 캔버스로 직접 그림 (선명하게)
+  const PH = 2.9, PW = PH * 0.78;
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.06, PH + 0.1, PW + 0.1), new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.6 }));
+  frame.position.set(-ROOM.w / 2 + 0.03, 0.25 + PH / 2, -1.2); frame.castShadow = true; scene.add(frame);
+  const posterMesh = new THREE.Mesh(new THREE.PlaneGeometry(PW, PH), new THREE.MeshBasicMaterial({ color: 0xf7f3ec }));
+  posterMesh.position.set(-ROOM.w / 2 + 0.07, 0.25 + PH / 2, -1.2); posterMesh.rotation.y = Math.PI / 2; posterMesh.name = 'poster'; scene.add(posterMesh);
+  const drawPoster = () => { const cv = eventPosterCanvas(); const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; posterMesh.material = new THREE.MeshBasicMaterial({ map: tex }); $('#posterImg').src = cv.toDataURL('image/png'); };
+  drawPoster(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawPoster); // 폰트 로드 후 한 번 더 (한글 선명)
+  const pspot = new THREE.SpotLight(0xffe9d2, 30, 8, 0.6, 0.6, 1.2); pspot.position.set(-ROOM.w / 2 + 2.2, ROOM.h - 0.1, -1.2); pspot.target.position.set(-ROOM.w / 2, 1.6, -1.2); scene.add(pspot, pspot.target);
+
   // 작은 메뉴 보드는 포스터 옆으로 (오른쪽 벽)
   const bc = document.createElement('canvas'); bc.width = 1024; bc.height = 560; const bg = bc.getContext('2d');
   bg.fillStyle = '#0f1112'; bg.fillRect(0, 0, 1024, 560);
@@ -291,6 +346,7 @@ function click(e) {
   ray.setFromCamera(ndc, camera);
   const hits = ray.intersectObjects(scene.children, true);
   for (const h of hits) {
+    if (h.object.name === 'poster') { $('#posterView').hidden = false; return; }
     if (h.object.userData.bed !== undefined) { const i = h.object.userData.bed; const b = beds[i]; if (b.occupant && b.occupant !== me.id) { toast('이미 누가 누워 있어요'); return; } goTo(b.x + (b.x > 0 ? -0.9 : 0.9), b.z, () => lieDown(i)); $('#hint').classList.add('fade'); return; }
     if (h.object.name === 'floor') { const p = h.point; goTo(clamp(p.x, -ROOM.w / 2 + 0.5, ROOM.w / 2 - 0.5), clamp(p.z, -ROOM.d / 2 + 0.5, ROOM.d / 2 - 0.5)); $('#hint').classList.add('fade'); return; }
   }
@@ -378,6 +434,8 @@ function say(t, ms = 2400) { const s = $('#say'); s.textContent = t; s.hidden = 
 function toast(t) { const s = $('#toast'); s.textContent = t; s.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { s.hidden = true; }, 1800); }
 BOOSTERS.forEach(b => { const el = document.createElement('button'); el.className = 'booster'; el.innerHTML = `<b></b><span></span><i>${b.shots} SHOTS</i>`; el.querySelector('b').textContent = b.n; el.querySelector('span').textContent = b.d; el.onclick = () => inject(b); $('#boosters').appendChild(el); });
 $('#standup').onclick = standUp; $('#getup').onclick = standUp;
+$('#posterClose').onclick = () => { $('#posterView').hidden = true; }; $('#posterView').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
+$('#posterKakao').href = CFG.kakao || '#';
 $('#shots b').textContent = shotsTotal;
 $('#kakao').href = CFG.kakao || '#';
 $('#nick').value = randomName();
